@@ -9,7 +9,7 @@ from app import db
 customers_bp = Blueprint("customers", __name__, url_prefix="/customers")
 
 @customers_bp.route("", methods=["POST"])
-def create_goal():
+def create_customer():
     request_body = request.get_json()
 
     if "name" not in request_body:
@@ -33,7 +33,7 @@ def create_goal():
     return {"id": new_customer.id}, 201
 
 @customers_bp.route("", methods=["GET"])
-def read_goals():
+def read_customers():
     customers = Customer.query.all()
 
     response_body = []
@@ -47,7 +47,7 @@ def read_goals():
     return response_body, 200
 
 @customers_bp.route("/<id>", methods=["GET"])
-def read_one_goal(id):
+def read_one_customer(id):
     if not isinstance(id, int):
         return {"message": f"{id} is not a valid id"}, 400
 
@@ -58,10 +58,16 @@ def read_one_goal(id):
 
     return customer.to_dict(), 200
 
-@customers_bp.route("", methods=["PUT", "PATCH"])
-def update_goal():
+@customers_bp.route("/<id>", methods=["PUT", "PATCH"])
+def update_customer(id):
+    request_body = request.get_json()
+
+    if "name" not in request_body or "phone" not in request_body \
+    or "postal_code" not in request_body:
+        return {}, 400
+
     pass
 
 @customers_bp.route("", methods=["DELETE"])
-def delete_goal():
+def delete_customer():
     pass
