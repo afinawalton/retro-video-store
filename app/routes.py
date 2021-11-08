@@ -12,6 +12,7 @@ customers_bp = Blueprint("customers", __name__, url_prefix="/customers")
 def create_customer():
     request_body = request.get_json()
 
+    missing = ""
     if "name" not in request_body:
         missing = "name"
     elif "postal_code" not in request_body:
@@ -44,7 +45,7 @@ def read_customers():
     for customer in customers:
         response_body.append(customer.to_dict())
     
-    return response_body, 200
+    return jsonify(response_body), 200
 
 @customers_bp.route("/<id>", methods=["GET"])
 def read_one_customer(id):
@@ -62,12 +63,31 @@ def read_one_customer(id):
 def update_customer(id):
     request_body = request.get_json()
 
+    customer = Customer.query.get(id)
+
+    if not customer:
+        return {"message": f"Customer {id} was not found"}, 404
+
     if "name" not in request_body or "phone" not in request_body \
     or "postal_code" not in request_body:
-        return {}, 400
+        return {"details": "Invalid request"}, 400
 
-    pass
+    customer.name = request_body["name"]
+    customer.phone = request_body["phone"]
+    customer.postal_code = request_body["postal_code"]
 
-@customers_bp.route("", methods=["DELETE"])
-def delete_customer():
-    pass
+    db.session.commit()
+
+    return customer.to_dict(), 200
+
+@customers_bp.route("/<id>", methods=["DELETE"])
+def delete_customer(id):
+    customer = Customer.query.get(id)
+
+    if not customer:
+        return {"message": f"Customer {id} was not found"}, 404
+
+    db.session.delete(customer)
+    db.session.commit()
+
+    return {"id": customer.id}, 200
