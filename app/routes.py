@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, make_response
 from flask.globals import request
-from app.models.customer import Customer
+from app.models.customer import Customer 
+from app.models.video import Video
 from app import db
 
 # --------------------------------
@@ -93,3 +94,24 @@ def delete_customer(id):
     db.session.commit()
 
     return {"id": customer.id}, 200
+
+
+# --------------------------------
+# -------- VIDEO ROUTES -------
+# --------------------------------
+videos_bp = Blueprint("videos", __name__, url_prefix="/video")
+
+@videos_bp.route("", methods=["GET"])
+def read_customers():
+    videos = Video.query.all()
+
+    response_body = []
+
+    if not videos:
+        return jsonify([]), 200
+
+    for video in videos:
+        response_body.append(video.to_dict())
+    
+    return jsonify(response_body), 200
+
