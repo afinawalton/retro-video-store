@@ -50,13 +50,15 @@ def read_customers():
 
 @customers_bp.route("/<id>", methods=["GET"])
 def read_one_customer(id):
-    if not isinstance(id, int):
-        return {"message": f"{id} is not a valid id"}, 400
+    try:
+        int(id)
+    except:
+        return {"message": "Invalid data"}, 400
 
     customer = Customer.query.get(id)
 
     if not customer:
-        return {"message": f"Customer {id} was not found"}, 404
+        return {"message": f"Customer {id} was not found"}, 404        
 
     return customer.to_dict(), 200
 
