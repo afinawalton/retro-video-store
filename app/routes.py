@@ -99,10 +99,10 @@ def delete_customer(id):
 # --------------------------------
 # -------- VIDEO ROUTES -------
 # --------------------------------
-videos_bp = Blueprint("videos", __name__, url_prefix="/video")
+videos_bp = Blueprint("videos", __name__, url_prefix="/videos")
 
 @videos_bp.route("", methods=["GET"])
-def read_customers():
+def read_videos():
     videos = Video.query.all()
 
     response_body = []
@@ -114,4 +114,43 @@ def read_customers():
         response_body.append(video.to_dict())
     
     return jsonify(response_body), 200
+
+@videos_bp.route("/<id>", methods=["GET"])
+def read_one_video(id):
+    try:
+        int(id)
+    except: 
+        return {"message": "Invalid data"}, 400
+
+    video = Video.query.get(id)
+
+    if not video:
+        return {"message": f"Video {id} was not found"}, 404        
+
+    return video.to_dict(), 200 
+
+@videos_bp.route("", methods=["POST"])
+def create_video():
+    request_body = request.get_json()
+
+    missing = ""
+    if "title" not in request_body:
+        missing = "title"
+    elif "release_date" not in request_body:
+        missing = "release_date"
+    elif "total_inventory" not in request_body:
+        missing = "total_inventory"
+    if missing:
+        return {"details": f"Request body must include {missing}."}, 400
+
+    new_video = Video(
+        title=request_body["title"],
+        release_date=request_body["release_date"],
+        inventory=request_body["total_inventory"]
+    )
+    
+    db.session.add(new_video)
+    db.session.commit()
+
+    return new_video.to_dict(), 201
 
