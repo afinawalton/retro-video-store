@@ -155,9 +155,7 @@ def create_video():
 @videos_bp.route("/<id>", methods=["PUT", "PATCH"])
 def update_videos(id):
     videos = Video.query.get(id)
-    print(videos)
     request_body= request.get_json()
-    print(request_body)
 
     if not videos:
         return {"message": f"Video {id} was not found"}, 404
