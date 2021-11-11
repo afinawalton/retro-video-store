@@ -40,9 +40,6 @@ def read_customers():
 
     response_body = []
 
-    if not customers:
-        return jsonify([]), 200
-
     for customer in customers:
         response_body.append(customer.to_dict())
     
