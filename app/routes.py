@@ -2,7 +2,11 @@ from flask import Blueprint, jsonify, make_response
 from flask.globals import request
 from app.models.customer import Customer 
 from app.models.video import Video
+from app.models.rental import Rental
 from app import db
+from datetime import date, datetime
+
+DUE_DATE = datetime.now() + 7
 
 # --------------------------------
 # -------- CUSTOMER ROUTES -------
@@ -94,7 +98,7 @@ def delete_customer(id):
 
 
 # --------------------------------
-# -------- VIDEO ROUTES -------
+# -------- VIDEO ROUTES ----------
 # --------------------------------
 videos_bp = Blueprint("videos", __name__, url_prefix="/videos")
 
@@ -183,3 +187,26 @@ def delete_video(id):
     db.session.commit()
 
     return {"id": video.id}, 200
+
+# --------------------------------
+# -------- RENTAL ROUTES ---------
+# --------------------------------
+rentals_bp = Blueprint("rentals", __name__, url_prefix="/rentals")
+
+@rentals_bp.route("/check-out", methods=["POST"])
+def create_rental():
+    request_body = request.get_json()
+
+    missing = ""
+    if "customer_id" not in request_body:
+        missing = "customer_id"
+    elif "video_id" not in request_body:
+        missing = "video_id"
+    if missing:
+        return {"details": f"Request body must include {missing}."}, 400
+
+    new_rental = Rental(
+        customer_id=request_body["customer_id"],
+        video_id=request_body["video_id"],
+        due_date=DUE_DATE
+    )
