@@ -169,7 +169,7 @@ def test_update_video(client, one_video):
     video = Video.query.get(1)
 
     assert video.title == "Updated Video Title"
-    assert video.total_inventory == 2
+    assert video.inventory == 2
 
 def test_update_video_not_found(client):
     # Act
