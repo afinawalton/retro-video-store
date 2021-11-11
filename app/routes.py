@@ -154,3 +154,37 @@ def create_video():
 
     return new_video.to_dict(), 201
 
+
+@videos_bp.route("/<id>", methods=["PUT", "PATCH"])
+def update_videos(id):
+    videos = Video.query.get(id)
+    print(videos)
+    request_body= request.get_json()
+    print(request_body)
+
+    if not videos:
+        return {"message": f"Video {id} was not found"}, 404
+
+    if "title" not in request_body or "release_date" not in request_body \
+    or "total_inventory" not in request_body:
+        return {"details": "Invalid request"}, 400
+
+    videos.title = request_body["title"]
+    videos.release_date = request_body["release_date"]
+    videos.inventory = request_body["total_inventory"]
+
+    db.session.commit()
+
+    return videos.to_dict(), 200
+
+@videos_bp.route("/<id>", methods=["DELETE"])
+def delete_video(id):
+    video = Video.query.get(id)
+
+    if not video:
+        return {"message": f"Video {id} was not found"}, 404
+
+    db.session.delete(video)
+    db.session.commit()
+
+    return {"id": video.id}, 200
