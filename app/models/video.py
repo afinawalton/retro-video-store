@@ -13,3 +13,19 @@ class Video(db.Model):
             "release_date": self.release_date,
             "total_inventory": self.inventory
         }
+
+    #finds the number of videos that are checked out from that video id
+    def find_rentals(self, video_id):   
+        from .rental import Rental 
+        count= 0
+        rentals = Rental.query.all()
+        for rental in rentals:
+            if rental.video_id == video_id:
+                count += 1
+        return count
+
+    def get_available_inventory(self):
+        return self.inventory - self.find_rentals(self.id)
+
+    # we need the video id of the rental and get the inventory attribute of that
+    # minus find_rentals with video id 

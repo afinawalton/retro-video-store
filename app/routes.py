@@ -2,11 +2,10 @@ from flask import Blueprint, jsonify, make_response
 from flask.globals import request
 from app.models.customer import Customer 
 from app.models.video import Video
-from app.models.rental import Rental
+from app.models.rental import Rental, due_date
 from app import db
 from datetime import date, datetime
 
-DUE_DATE = datetime.now() + 7
 
 # --------------------------------
 # -------- CUSTOMER ROUTES -------
@@ -204,9 +203,26 @@ def create_rental():
         missing = "video_id"
     if missing:
         return {"details": f"Request body must include {missing}."}, 400
+    
+    video = Video.query.get(request_body["video_id"])
+    if not video:
+        return {"message": "Video not found"}, 404
 
+    customer = Customer.query.get(request_body["customer_id"])
+    if not customer:
+        return {"message": "Customer not found"}, 404
+
+    #we check that our get available inventory is equal to zero 
+    if not video.get_available_inventory():
+        return {"message": "Could not perform checkout"}, 400
+     
     new_rental = Rental(
         customer_id=request_body["customer_id"],
         video_id=request_body["video_id"],
-        due_date=DUE_DATE
+        due_date=due_date()
     )
+
+    db.session.add(new_rental)
+    db.session.commit()
+
+    return new_rental.to_dict(), 200 
