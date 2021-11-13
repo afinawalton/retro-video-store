@@ -45,10 +45,6 @@ class Rental(db.Model):
 
     def get_rental_by_video(self, id):
         customer = Customer.query.get(id)
-        # List customers that have video checked out
-        # Take video_rentals list of instances
-        # Access customer_ids in a list
-        # Store customers in
 
         return {
             "due_date": self.due_date,
@@ -59,6 +55,3 @@ class Rental(db.Model):
 
 def due_date():
     return datetime.datetime.now() + datetime.timedelta(days=7)
-    #videos checked out count- the number of outstanding rentals we have, 
-    #the number of times this been rented out but not yet returned
-    #total number of copies on the shelf
