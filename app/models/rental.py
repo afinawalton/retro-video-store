@@ -33,6 +33,15 @@ class Rental(db.Model):
             "available_inventory": self.get_available_inventory(),
         }
 
+    def rental_dict(self, id):
+        video = Video.query.get(id)
+
+        return {
+            "release_date": video.release_date,
+            "title": video.title,
+            "due_date": self.due_date
+        }
+
 def due_date():
     return datetime.datetime.now() + datetime.timedelta(days=7)
     #videos checked out count- the number of outstanding rentals we have, 

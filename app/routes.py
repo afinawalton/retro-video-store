@@ -6,6 +6,8 @@ from app.models.rental import Rental, due_date
 from app import db
 from datetime import date, datetime
 
+from tests.test_wave_02 import CUSTOMER_ID
+
 
 # --------------------------------
 # -------- CUSTOMER ROUTES -------
@@ -61,6 +63,21 @@ def read_one_customer(id):
         return {"message": f"Customer {id} was not found"}, 404        
 
     return customer.to_dict(), 200
+
+@customers_bp.route("/<id>/rentals")
+def read_customer_rentals(id):
+    customer = Customer.query.get(id)
+    customer_rentals = Rental.query.filter(Rental.customer_id == id).all()
+
+    rentals_response = []
+
+    if not customer:
+        return {"message": f"Customer {id} was not found"}, 404
+    
+    for item in customer_rentals:
+        rentals_response.append(item.rental_dict(item.video_id))
+
+    return jsonify(rentals_response), 200
 
 @customers_bp.route("/<id>", methods=["PUT", "PATCH"])
 def update_customer(id):
