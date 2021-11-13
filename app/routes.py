@@ -64,21 +64,6 @@ def read_one_customer(id):
 
     return customer.to_dict(), 200
 
-@customers_bp.route("/<id>/rentals")
-def read_customer_rentals(id):
-    customer = Customer.query.get(id)
-    customer_rentals = Rental.query.filter(Rental.customer_id == id).all()
-
-    rentals_response = []
-
-    if not customer:
-        return {"message": f"Customer {id} was not found"}, 404
-    
-    for item in customer_rentals:
-        rentals_response.append(item.rental_dict(item.video_id))
-
-    return jsonify(rentals_response), 200
-
 @customers_bp.route("/<id>", methods=["PUT", "PATCH"])
 def update_customer(id):
     request_body = request.get_json()
@@ -229,7 +214,6 @@ def create_rental():
     if not customer:
         return {"message": "Customer not found"}, 404
 
-    #we check that our get available inventory is equal to zero 
     if not video.get_available_inventory():
         return {"message": "Could not perform checkout"}, 400
      
@@ -242,4 +226,35 @@ def create_rental():
     db.session.add(new_rental)
     db.session.commit()
 
-    return new_rental.to_dict(), 200 
+    return new_rental.to_dict(), 200
+
+@customers_bp.route("/<customer_id>/rentals")
+def read_rentals_by_customer(customer_id):
+    customer = Customer.query.get(customer_id)
+    customer_rentals = Rental.query.filter(Rental.customer_id == customer_id).all()
+
+    rentals_response = []
+
+    if not customer:
+        return {"message": f"Customer {customer_id} was not found"}, 404
+    
+    for item in customer_rentals:
+        rentals_response.append(item.get_rental_by_customer(item.video_id))
+
+    return jsonify(rentals_response), 200
+
+@videos_bp.route("/<video_id>/rentals")
+def read_rentals_by_video(video_id):
+    video = Video.query.get(video_id)
+    video_rentals = Rental.query.filter(Rental.video_id == video_id).all()
+
+    rentals_response = []    
+
+    if not video:
+        return {"message": f"Video {video_id} was not found"}, 404
+
+    for item in video_rentals:
+        id = item.customer_id
+        rentals_response.append(item.get_rental_by_video(id))
+    
+    return jsonify(rentals_response), 200

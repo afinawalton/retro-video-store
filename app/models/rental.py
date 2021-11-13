@@ -1,5 +1,6 @@
 from app import db
 from .video import Video 
+from .customer import Customer
 import datetime
 
 class Rental(db.Model):
@@ -33,13 +34,27 @@ class Rental(db.Model):
             "available_inventory": self.get_available_inventory(),
         }
 
-    def rental_dict(self, id):
+    def get_rental_by_customer(self, id):
         video = Video.query.get(id)
 
         return {
             "release_date": video.release_date,
             "title": video.title,
             "due_date": self.due_date
+        }
+
+    def get_rental_by_video(self, id):
+        customer = Customer.query.get(id)
+        # List customers that have video checked out
+        # Take video_rentals list of instances
+        # Access customer_ids in a list
+        # Store customers in
+
+        return {
+            "due_date": self.due_date,
+            "name": customer.name,
+            "phone": customer.phone,
+            "postal_code": customer.postal_code
         }
 
 def due_date():
