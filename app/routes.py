@@ -228,6 +228,48 @@ def create_rental():
 
     return new_rental.to_dict(), 200
 
+#either delete the rental or change it's status to "checked_in"
+@rentals_bp.route("/check-in", methods=["POST"])
+def check_in_rental():
+    request_body = request.get_json()
+
+    missing = ""
+    if "customer_id" not in request_body:
+        missing = "customer_id"
+    elif "video_id" not in request_body:
+        missing = "video_id"
+    if missing:
+        return {"details": f"Request body must include {missing}."}, 400
+    
+    video = Video.query.get(request_body["video_id"])
+    if not video:
+        return {"message": "Video not found"}, 404
+
+    customer = Customer.query.get(request_body["customer_id"])
+    if not customer:
+        return {"message": "Customer not found"}, 404
+    
+    #the video and customer do not match a current rental
+    matching_rental = Rental.query.filter(Rental.customer_id == customer.id, Rental.video_id == video.id ).first()
+    if not matching_rental:
+        return {"message": f"No outstanding rentals for customer {customer.id} and video {video.id}"}, 400
+
+    db.session.delete(matching_rental)
+    db.session.commit()
+
+    return matching_rental.to_dict(), 200
+
+
+
+
+
+
+
+
+
+
+
+
 @customers_bp.route("/<customer_id>/rentals")
 def read_rentals_by_customer(customer_id):
     customer = Customer.query.get(customer_id)
