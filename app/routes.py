@@ -259,17 +259,6 @@ def check_in_rental():
 
     return matching_rental.to_dict(), 200
 
-
-
-
-
-
-
-
-
-
-
-
 @customers_bp.route("/<customer_id>/rentals")
 def read_rentals_by_customer(customer_id):
     customer = Customer.query.get(customer_id)
@@ -281,7 +270,8 @@ def read_rentals_by_customer(customer_id):
         return {"message": f"Customer {customer_id} was not found"}, 404
     
     for item in customer_rentals:
-        rentals_response.append(item.get_rental_by_customer(item.video_id))
+        id = item.video_id
+        rentals_response.append(item.get_rental_by_customer(id))
 
     return jsonify(rentals_response), 200
 
