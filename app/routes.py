@@ -148,7 +148,7 @@ def create_video():
     new_video = Video(
         title=request_body["title"],
         release_date=request_body["release_date"],
-        inventory=request_body["total_inventory"]
+        total_inventory=request_body["total_inventory"]
     )
     
     db.session.add(new_video)
@@ -171,7 +171,7 @@ def update_videos(id):
 
     videos.title = request_body["title"]
     videos.release_date = request_body["release_date"]
-    videos.inventory = request_body["total_inventory"]
+    videos.total_inventory = request_body["total_inventory"]
 
     db.session.commit()
 

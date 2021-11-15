@@ -4,14 +4,14 @@ class Video(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String)
     release_date = db.Column(db.String)
-    inventory = db.Column(db.Integer)
+    total_inventory = db.Column(db.Integer)
 
     def to_dict(self):
         return {
             "id": self.id,
             "title": self.title,
             "release_date": self.release_date,
-            "total_inventory": self.inventory
+            "total_inventory": self.total_inventory
         }
 
     #finds the number of videos that are checked out from that video id
@@ -25,7 +25,7 @@ class Video(db.Model):
         return count
 
     def get_available_inventory(self):
-        return self.inventory - self.find_rentals(self.id)
+        return self.total_inventory - self.find_rentals(self.id)
 
     # we need the video id of the rental and get the inventory attribute of that
     # minus find_rentals with video id 

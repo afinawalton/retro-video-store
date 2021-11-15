@@ -21,7 +21,7 @@ class Rental(db.Model):
 
     def get_available_inventory(self):
         rental = Video.query.get(self.video_id)
-        return rental.inventory - self.find_rentals(rental.id)
+        return rental.total_inventory - self.find_rentals(rental.id)
 
     # we need the video id of the rental and get the inventory attribute of that
     # minus find_rentals with video id  

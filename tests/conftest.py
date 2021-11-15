@@ -39,7 +39,7 @@ def one_video(app):
     new_video = Video(
         title=VIDEO_TITLE, 
         release_date=VIDEO_RELEASE_DATE,
-        inventory=VIDEO_INVENTORY,
+        total_inventory=VIDEO_INVENTORY,
         )
     db.session.add(new_video)
     db.session.commit()
